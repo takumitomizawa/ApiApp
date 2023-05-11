@@ -65,10 +65,6 @@ class WebViewActivity : AppCompatActivity() {
             imageUrl = shop.logoImage
             address = shop.address
             url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
-            Log.d("test shop-id", id)
-            Log.d("test shop-name",name)
-            Log.d("test shop-imageUrl", imageUrl)
-            Log.d("test shop-url", url)
         })
         handler.post {
             binding.couponFavoriteImageView.setImageResource(R.drawable.ic_star)
