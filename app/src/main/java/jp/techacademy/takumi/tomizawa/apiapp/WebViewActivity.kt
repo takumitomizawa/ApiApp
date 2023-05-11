@@ -6,16 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import com.squareup.picasso.Picasso
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityWebViewBinding
 
 class WebViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWebViewBinding
-
-    var onClickAddFavorite: ((Shop) -> Unit)? = null
-    var onClickDeleteFavorite: ((Shop) -> Unit)? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +27,7 @@ class WebViewActivity : AppCompatActivity() {
             // お気に入り状態を取得
             val isFavorite = FavoriteShop.findBy(intent.getStringExtra(ID)!!) != null
 
-            val couponUrls = CouponUrls("", KEY_URL)
+            val couponUrls = CouponUrls(intent.getStringExtra(KEY_URL)!!, intent.getStringExtra(KEY_URL)!!)
 
             val shop = Shop(
                 couponUrls,
@@ -68,6 +65,10 @@ class WebViewActivity : AppCompatActivity() {
             imageUrl = shop.logoImage
             address = shop.address
             url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
+            Log.d("test shop-id", id)
+            Log.d("test shop-name",name)
+            Log.d("test shop-imageUrl", imageUrl)
+            Log.d("test shop-url", url)
         })
         handler.post {
             binding.couponFavoriteImageView.setImageResource(R.drawable.ic_star)
