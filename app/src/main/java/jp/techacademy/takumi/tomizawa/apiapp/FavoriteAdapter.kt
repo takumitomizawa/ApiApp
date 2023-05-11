@@ -42,7 +42,7 @@ class FavoriteItemViewHolder(private val binding: RecyclerFavoriteBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(favoriteShop: FavoriteShop, position: Int, adapter: FavoriteAdapter) {
         //val shop = favoriteShop as Shop
-        val couponUrls = CouponUrls("",favoriteShop.url)
+        val couponUrls = CouponUrls(favoriteShop.url,favoriteShop.url)
         val shop = Shop(couponUrls,favoriteShop.address,favoriteShop.id,favoriteShop.imageUrl,favoriteShop.name)
 
         // 偶数番目と奇数番目で背景色を変更させる

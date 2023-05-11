@@ -106,7 +106,7 @@ class WebViewActivity : AppCompatActivity() {
             activity.startActivity(
                 Intent(activity, WebViewActivity::class.java).putExtra(
                     KEY_URL,
-                    shop.couponUrls.sp
+                    shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
                 ).putExtra(
                     NAME, shop.name
                 ).putExtra(
