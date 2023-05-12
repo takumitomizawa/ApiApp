@@ -16,6 +16,9 @@ import jp.techacademy.takumi.tomizawa.apiapp.databinding.RecyclerFavoriteBinding
  */
 class ApiAdapter : ListAdapter<Shop, ApiItemViewHolder>(ApiItemCallback()) {
 
+    private var dataList: List<FavoriteShop> = emptyList()
+    private var filteredList: List<FavoriteShop> = emptyList()
+
     // 一覧画面から登録するときのコールバック（FavoriteFragmentへ通知するメソッド)
     var onClickAddFavorite: ((Shop) -> Unit)? = null
 
@@ -33,6 +36,17 @@ class ApiAdapter : ListAdapter<Shop, ApiItemViewHolder>(ApiItemCallback()) {
         val view =
             RecyclerFavoriteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ApiItemViewHolder(view)
+    }
+
+    fun updateData(data: List<FavoriteShop>){
+        dataList = data
+        // フィルタリング処理を実行して表示するデータリストを更新する
+        filteredList = filterDeletedData(data)
+        notifyDataSetChanged()
+    }
+
+    private fun filterDeletedData(data: List<FavoriteShop>): List<FavoriteShop>{
+        return data.filter { !it.deleteFrag }
     }
 
     /**

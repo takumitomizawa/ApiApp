@@ -7,13 +7,14 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class FavoriteShop(id: String, imageUrl: String, name: String, address: String, url: String) : RealmObject {
+open class FavoriteShop(id: String, imageUrl: String, name: String, address: String, url: String, deleteFrag: Boolean) : RealmObject {
     @PrimaryKey
     var id: String = ""
     var imageUrl: String = ""
     var name: String = ""
     var address: String = ""
     var url: String = ""
+    var deleteFrag: Boolean = false
 
     // 初期化処理
     init {
@@ -22,10 +23,11 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
         this.name = name
         this.address = address
         this.url = url
+        this.deleteFrag = deleteFrag
     }
 
     // realm内部呼び出し用にコンストラクタを用意
-    constructor() : this("", "", "","","")
+    constructor() : this("", "", "","","",false)
 
     companion object {
         /**
@@ -35,17 +37,35 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
             // Realmデータベースとの接続を開く
             val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
             val realm = Realm.open(config)
+            val deleteCheck = false
 
-            // Realmデータベースからお気に入り情報を取得
+            // RealmデータベースからdeleteFragがfalseのお気に入り情報を取得
             // mapでディープコピーしてresultに代入する
-            val result = realm.query<FavoriteShop>().find()
-                .map { FavoriteShop(it.id, it.imageUrl, it.name, it.address, it.url) }
+            val result = realm.query<FavoriteShop>("deleteFrag==$deleteCheck").find()
+                .map { FavoriteShop(it.id, it.imageUrl, it.name, it.address, it.url, it.deleteFrag) }
 
             // Realmデータベースとの接続を閉じる
             realm.close()
 
             return result
         }
+
+        /*fun findDeleteStore(): List<FavoriteShop>{
+            // Realmデータベースとの接続を開く
+            val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+            val realm = Realm.open(config)
+            val deleteCheck = true
+
+            // Realmデータベースからお気に入り情報を取得
+            // deleteFragがtrueのデータのみを取得する
+            val deleteStore = realm.query<FavoriteShop>("deleteFrag==$deleteCheck").find()
+                .map { FavoriteShop(it.id, it.imageUrl, it.name, it.address, it.url, it.deleteFrag) }
+
+            // Realmデータベースとの接続を閉じる
+            realm.close()
+
+            return deleteStore
+        }*/
 
         /**
          * お気に入りされているShopをidで検索して返す
@@ -57,7 +77,6 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
             val realm = Realm.open(config)
 
             val result = realm.query<FavoriteShop>("id=='$id'").first().find()
-            Log.d("result", result.toString())
 
             // Realmデータベースとの接続を閉じる
             realm.close()
