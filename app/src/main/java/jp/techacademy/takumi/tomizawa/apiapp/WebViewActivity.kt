@@ -8,6 +8,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AlertDialog
 import com.squareup.picasso.Picasso
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityWebViewBinding
 
 class WebViewActivity : AppCompatActivity() {
@@ -23,9 +26,9 @@ class WebViewActivity : AppCompatActivity() {
         Picasso.get().load(intent.getStringExtra(IMAGE)).into(binding.couponImageView)
 
         binding.couponFavoriteImageView.apply {
-            // お気に入り状態を取得
-            val isFavorite = FavoriteShop.findBy(intent.getStringExtra(ID)!!) != null
-
+            val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+            val realm = Realm.open(config)
+            val check = true
             val couponUrls = CouponUrls(intent.getStringExtra(KEY_URL)!!, intent.getStringExtra(KEY_URL)!!)
 
             val shop = Shop(
@@ -36,13 +39,19 @@ class WebViewActivity : AppCompatActivity() {
                 intent.getStringExtra(NAME)!!
             )
 
+            val result = realm.query<FavoriteShop>("favoriteCheck == $check").find()
+
+            val isFavorite = result.any {it.id == intent.getStringExtra(ID)}
+
             // 白抜きの星を設定
             setImageResource(if (isFavorite) R.drawable.ic_star else R.drawable.ic_star_border)
 
+            // Realmデータベースとの接続を閉じる
+            realm.close()
+
             // 星をタップした時の処理
             setOnClickListener {
-                val isFavorite = FavoriteShop.findBy(intent.getStringExtra(ID)!!) != null
-
+                //val isFavorite = FavoriteShop.findBy(intent.getStringExtra(ID)!!) != null
                 if (isFavorite) {
                     onDeleteFavorite(ID)
                 } else {
@@ -58,13 +67,25 @@ class WebViewActivity : AppCompatActivity() {
 
     private fun onAddFavorite(shop: Shop) {
         var handler = Handler(Looper.getMainLooper())
-        FavoriteShop.insert(FavoriteShop().apply {
-            id = shop.id
-            name = shop.name
-            imageUrl = shop.logoImage
-            address = shop.address
-            url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
-        })
+        val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+        val realm = Realm.open(config)
+        val check = false
+
+        val result = realm.query<FavoriteShop>("favoriteCheck == $check").find()
+
+        val nowFavorite = result.any {it.id == shop.id}
+        if (nowFavorite){
+            FavoriteShop.update(intent.getStringExtra(ID)!!)
+        }else{
+            FavoriteShop.insert(FavoriteShop().apply {
+                id = shop.id
+                name = shop.name
+                imageUrl = shop.logoImage
+                address = shop.address
+                url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
+            })
+        }
+
         handler.post {
             binding.couponFavoriteImageView.setImageResource(R.drawable.ic_star)
         }

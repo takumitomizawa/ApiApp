@@ -2,11 +2,15 @@ package jp.techacademy.takumi.tomizawa.apiapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), FragmentCallback {
@@ -66,13 +70,26 @@ class MainActivity : AppCompatActivity(), FragmentCallback {
      * Favoriteに追加するときのメソッド(Fragment -> Activity へ通知する)
      */
     override fun onAddFavorite(shop: Shop) {
-        FavoriteShop.insert(FavoriteShop().apply {
-            id = shop.id
-            name = shop.name
-            imageUrl = shop.logoImage
-            address = shop.address
-            url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
-        })
+        val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+        val realm = Realm.open(config)
+        val check = false
+
+        val result = realm.query<FavoriteShop>("favoriteCheck == $check").find()
+
+        val nowFavorite = result.any {it.id == shop.id}
+
+        if (nowFavorite){
+            FavoriteShop.update(shop.id)
+        }else{
+            FavoriteShop.insert(FavoriteShop().apply {
+                id = shop.id
+                name = shop.name
+                imageUrl = shop.logoImage
+                address = shop.address
+                url = shop.couponUrls.sp.ifEmpty { shop.couponUrls.pc }
+            })
+        }
+
         (viewPagerAdapter.fragments[VIEW_PAGER_POSITION_FAVORITE] as FavoriteFragment).updateData()
     }
 

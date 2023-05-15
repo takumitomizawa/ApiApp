@@ -6,7 +6,14 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class FavoriteShop(id: String, imageUrl: String, name: String, address: String, url: String, favoriteCheck: Boolean) : RealmObject {
+open class FavoriteShop(
+    id: String,
+    imageUrl: String,
+    name: String,
+    address: String,
+    url: String,
+    favoriteCheck: Boolean
+) : RealmObject {
     @PrimaryKey
     var id: String = ""
     var imageUrl: String = ""
@@ -26,7 +33,7 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
     }
 
     // realm内部呼び出し用にコンストラクタを用意
-    constructor() : this("", "", "","","",true)
+    constructor() : this("", "", "", "", "", true)
 
     companion object {
         /**
@@ -41,7 +48,16 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
             // RealmデータベースからdeleteFragがfalseのお気に入り情報を取得
             // mapでディープコピーしてresultに代入する
             val result = realm.query<FavoriteShop>("favoriteCheck==$isFavorite").find()
-                .map { FavoriteShop(it.id, it.imageUrl, it.name, it.address, it.url, it.favoriteCheck) }
+                .map {
+                    FavoriteShop(
+                        it.id,
+                        it.imageUrl,
+                        it.name,
+                        it.address,
+                        it.url,
+                        it.favoriteCheck
+                    )
+                }
 
             // Realmデータベースとの接続を閉じる
             realm.close()
@@ -100,6 +116,20 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
             realm.close()
         }
 
+        fun update(id: String) {
+            // Realmデータベースとの接続を開く
+            val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+            val realm = Realm.open(config)
+
+            // 削除処理
+            realm.writeBlocking {
+                val favoriteShop = query<FavoriteShop>("id == '$id'").first().find()
+                if (favoriteShop != null) {
+                    favoriteShop.favoriteCheck = true
+                }
+            }
+        }
+
         /**
          * idでお気に入りから削除する
          */
@@ -114,10 +144,6 @@ open class FavoriteShop(id: String, imageUrl: String, name: String, address: Str
                 if (favoriteShop != null) {
                     favoriteShop.favoriteCheck = false
                 }
-                /*val favoriteShops = query<FavoriteShop>("id=='$id'").find()
-                favoriteShops.forEach {
-                    delete(it)
-                }*/
             }
 
             // Realmデータベースとの接続を閉じる
