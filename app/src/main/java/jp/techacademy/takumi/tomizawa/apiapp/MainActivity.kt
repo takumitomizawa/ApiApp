@@ -7,7 +7,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import io.realm.kotlin.Realm
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), FragmentCallback {
@@ -100,10 +99,12 @@ class MainActivity : AppCompatActivity(), FragmentCallback {
     }
 
     private fun deleteFavorite(id: String) {
-        val favoriteShop = FavoriteShop.findBy(id)
-        favoriteShop?.deleteFrag = true
+        //val favoriteShop = FavoriteShop.findBy(id)
+        /*if(favoriteShop != null){
+            favoriteShop.deleteFrag = false
+        }*/
 
-        //FavoriteShop.delete(id)
+        FavoriteShop.delete(id)
         (viewPagerAdapter.fragments[VIEW_PAGER_POSITION_API] as ApiFragment).updateView()
         (viewPagerAdapter.fragments[VIEW_PAGER_POSITION_FAVORITE] as FavoriteFragment).updateData()
     }

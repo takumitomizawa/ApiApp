@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.RecyclerFavoriteBinding
 
 /**
@@ -15,9 +18,6 @@ import jp.techacademy.takumi.tomizawa.apiapp.databinding.RecyclerFavoriteBinding
  * 第二引数: リスト内の1行の内容を保持するViewHolder。今回はApiItemViewHolder
  */
 class ApiAdapter : ListAdapter<Shop, ApiItemViewHolder>(ApiItemCallback()) {
-
-    private var dataList: List<FavoriteShop> = emptyList()
-    private var filteredList: List<FavoriteShop> = emptyList()
 
     // 一覧画面から登録するときのコールバック（FavoriteFragmentへ通知するメソッド)
     var onClickAddFavorite: ((Shop) -> Unit)? = null
@@ -38,7 +38,7 @@ class ApiAdapter : ListAdapter<Shop, ApiItemViewHolder>(ApiItemCallback()) {
         return ApiItemViewHolder(view)
     }
 
-    fun updateData(data: List<FavoriteShop>){
+    /*fun updateData(data: List<FavoriteShop>){
         dataList = data
         // フィルタリング処理を実行して表示するデータリストを更新する
         filteredList = filterDeletedData(data)
@@ -46,8 +46,8 @@ class ApiAdapter : ListAdapter<Shop, ApiItemViewHolder>(ApiItemCallback()) {
     }
 
     private fun filterDeletedData(data: List<FavoriteShop>): List<FavoriteShop>{
-        return data.filter { !it.deleteFrag }
-    }
+        return data.filter { !it.isFavorite }
+    }*/
 
     /**
      * 指定された位置（position）のViewにShopの情報をセットする
@@ -86,11 +86,23 @@ class ApiItemViewHolder(private val binding: RecyclerFavoriteBinding) :
 
         // 星の処理
         binding.favoriteImageView.apply {
+            // Realmデータベースとの接続を開く
+            val config = RealmConfiguration.create(schema = setOf(FavoriteShop::class))
+            val realm = Realm.open(config)
+            val check = true
+
+            val result = realm.query<FavoriteShop>("favoriteCheck == $check").find()
+
             // お気に入り状態を取得
-            val isFavorite = FavoriteShop.findBy(shop.id) != null
+            //val isFavorite = FavoriteShop.findBy(shop.id) != null
+
+            val isFavorite = result.any {it.id == shop.id}
 
             // 白抜きの星を設定
             setImageResource(if (isFavorite) R.drawable.ic_star else R.drawable.ic_star_border)
+
+            // Realmデータベースとの接続を閉じる
+            realm.close()
 
             // 星をタップした時の処理
             setOnClickListener {

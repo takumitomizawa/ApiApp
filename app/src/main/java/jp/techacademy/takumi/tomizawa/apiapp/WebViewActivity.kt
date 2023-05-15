@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import com.squareup.picasso.Picasso
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityWebViewBinding
