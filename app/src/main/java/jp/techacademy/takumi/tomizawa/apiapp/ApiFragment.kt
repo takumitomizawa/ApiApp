@@ -203,8 +203,8 @@ class ApiFragment : Fragment() {
                     }
                 }
                 handler.post {
-                    updateRecyclerView(list)
                     updateView()
+                    updateRecyclerView(list)
                 }
                 isLoading = false // 読み込み中フラグを折る
             }
