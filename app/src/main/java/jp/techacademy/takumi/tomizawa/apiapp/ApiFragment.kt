@@ -4,13 +4,17 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.moshi.Moshi
+import jp.techacademy.takumi.tomizawa.apiapp.databinding.ActivityMainBinding
 import jp.techacademy.takumi.tomizawa.apiapp.databinding.FragmentApiBinding
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
@@ -50,6 +54,7 @@ class ApiFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentApiBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -60,6 +65,7 @@ class ApiFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // ここから初期化処理を行う
         // ApiAdapterのお気に入り追加、削除用のメソッドの追加を行う
         apiAdapter.apply {
@@ -117,6 +123,59 @@ class ApiFragment : Fragment() {
             updateData()
         }
         updateData()
+
+        val editText = view.findViewById<EditText>(R.id.categorySortText)
+        val button = view.findViewById<Button>(R.id.categorySortButton)
+
+        button?.setOnClickListener{
+            Log.d("test buttonCheck", "通過")
+            val keyword = editText?.text.toString()
+            // 開始位置を計算
+            val start = page * COUNT + 1
+            val url = StringBuilder()
+                .append(getString(R.string.base_url)) // https://webservice.recruit.co.jp/hotpepper/gourmet/v1/
+                .append("?key=").append(getString(R.string.api_key)) // Apiを使うためのApiKey
+                .append("&start=").append(start) // 何件目からのデータを取得するか
+                .append("&count=").append(COUNT) // 1回で20件取得する
+                .append("&keyword=")
+                .append(keyword) // お店の検索ワード。ここでは例として「ランチ」を検索
+                .append("&format=json") // ここで利用しているAPIは戻りの形をxmlかjsonが選択することができる。Androidで扱う場合はxmlよりもjsonの方が扱いやすいので、jsonを選択
+                .toString()
+            val client = OkHttpClient.Builder()
+                .addInterceptor(HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                })
+                .build()
+            val request = Request.Builder()
+                .url(url)
+                .build()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) { // Error時の処理
+                    e.printStackTrace()
+                    handler.post {
+                        updateRecyclerView(listOf())
+                    }
+                    isLoading = false // 読み込み中フラグを折る
+                }
+
+                override fun onResponse(call: Call, response: Response) { // 成功時の処理
+                    // Jsonを変換するためのAdapterを用意
+                    val moshi = Moshi.Builder().build()
+                    val jsonAdapter = moshi.adapter(ApiResponse::class.java)
+
+                    response.body?.string()?.also {
+                        val apiResponse = jsonAdapter.fromJson(it)
+                        if (apiResponse != null) {
+                            list += apiResponse.results.shop
+                        }
+                    }
+                    handler.post {
+                        updateRecyclerView(list)
+                    }
+                    isLoading = false // 読み込み中フラグを折る
+                }
+            })
+        }
     }
 
     /**
