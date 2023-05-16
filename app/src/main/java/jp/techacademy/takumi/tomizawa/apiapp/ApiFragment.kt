@@ -124,10 +124,13 @@ class ApiFragment : Fragment() {
         }
         updateData()
 
-        val editText = view.findViewById<EditText>(R.id.categorySortText)
-        val button = view.findViewById<Button>(R.id.categorySortButton)
+        val inflater = LayoutInflater.from(requireContext())
+        val mainView = inflater.inflate(R.layout.activity_main, null)
 
-        button?.setOnClickListener{
+        val editText = mainView.findViewById<EditText>(R.id.categorySortText)
+        val button = mainView.findViewById<Button>(R.id.categorySortButton)
+
+        button.setOnClickListener{
             Log.d("test buttonCheck", "通過")
             val keyword = editText?.text.toString()
             // 開始位置を計算
@@ -202,7 +205,7 @@ class ApiFragment : Fragment() {
             list.clear()
         }
         // 開始位置を計算
-        val start = page * COUNT + 1
+        /*val start = page * COUNT + 1
 
         val url = StringBuilder()
             .append(getString(R.string.base_url)) // https://webservice.recruit.co.jp/hotpepper/gourmet/v1/
@@ -246,7 +249,7 @@ class ApiFragment : Fragment() {
                 }
                 isLoading = false // 読み込み中フラグを折る
             }
-        })
+        })*/
     }
     // -----変更ここまで
 
