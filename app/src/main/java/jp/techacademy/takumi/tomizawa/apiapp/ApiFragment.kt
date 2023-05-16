@@ -130,7 +130,6 @@ class ApiFragment : Fragment() {
 
         sortButton.setOnClickListener{
             updateData()
-            updateView()
         }
     }
 
@@ -205,11 +204,11 @@ class ApiFragment : Fragment() {
                 }
                 handler.post {
                     updateRecyclerView(list)
+                    updateView()
                 }
                 isLoading = false // 読み込み中フラグを折る
             }
         })
-        updateView()
     }
     // -----変更ここまで
 

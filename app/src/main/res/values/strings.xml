@@ -11,6 +11,6 @@
     <string name="delete_favorite_dialog_title">お気に入りの削除</string>
     <string name="delete_favorite_dialog_message">お気に入りを削除しますか？</string>
     <string name="empty_favorite">お気に入りはまだ登録されていません。</string>
-    <string name="categoryName">カテゴリ(例.ランチ)</string>
+    <string name="categoryName">入力せずに検索するとランチの結果を表示</string>
     <string name="Search">検索</string>
 </resources>
