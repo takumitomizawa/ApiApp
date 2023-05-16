@@ -50,10 +50,10 @@ class MainActivity : AppCompatActivity(), FragmentCallback {
         })
     }
 
-    override fun onResume() {
+    /*override fun onResume() {
         super.onResume()
         binding.categorySortText.text
-    }
+    }*/
 
     override fun onClickItem(shop: Shop) {
         WebViewActivity.start(this, shop)

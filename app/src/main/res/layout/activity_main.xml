@@ -15,32 +15,10 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <EditText
-        android:id="@+id/categorySortText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/categoryName"
-        app:layout_constraintBottom_toTopOf="@+id/viewPager2"
-        app:layout_constraintDimensionRatio="1:1" />
-
-    <Button
-        android:id="@+id/categorySortButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Search"
-        app:layout_constraintBottom_toBottomOf="@id/tabLayout"
-        app:layout_constraintBottom_toTopOf="@+id/viewPager2"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/categorySortText"
-        />
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
